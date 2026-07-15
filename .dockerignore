@@ -1,0 +1,9 @@
+venv/
+__pycache__/
+.git/
+.gitignore
+.env
+uploads/
+faiss_index.index
+chunks.pkl
+*.pyc
