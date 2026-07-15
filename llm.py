@@ -1,19 +1,21 @@
+import os
 import requests
 from dotenv import load_dotenv
-import os
 
 load_dotenv()
 
-OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY")
 
-if not OPENROUTER_API_KEY:
-    raise Exception("OpenRouter API key missing")
 def generate_answer(context, question):
+
+    api_key = os.getenv("OPENROUTER_API_KEY")
+
+    if not api_key:
+        return "OpenRouter API key is missing."
 
     url = "https://openrouter.ai/api/v1/chat/completions"
 
     headers = {
-        "Authorization": f"Bearer {OPENROUTER_API_KEY}",
+        "Authorization": f"Bearer {api_key}",
         "Content-Type": "application/json",
         "HTTP-Referer": "http://localhost:8000",
         "X-Title": "RAG Chatbot"
@@ -24,34 +26,26 @@ def generate_answer(context, question):
         "messages": [
             {
                 "role": "system",
-                "content": "You are a helpful AI assistant. answer only using the provided context."
+                "content": "Answer only using the provided context. If information is unavailable, say it is not mentioned."
             },
             {
                 "role": "user",
                 "content": f"""
+Context:
+{context}
 
-Context: {context}
-
-Question: {question}
+Question:
+{question}
 """
             }
         ]
     }
 
-    response = requests.post(
-        url,
-        headers=headers,
-        json=data
-    )
+    response = requests.post(url, headers=headers, json=data)
 
     result = response.json()
 
     if response.status_code != 200:
-        return{
-            "error": result
-        }
-    
+        return "LLM Error: " + str(result)
+
     return result["choices"][0]["message"]["content"]
-
-
-    
