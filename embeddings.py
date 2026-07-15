@@ -24,5 +24,11 @@ def create_embeddings(chunks):
     return embeddings.astype("float32")
 
 def create_query_embedding(question):
-    embedding = get_model().encode([question])
-    return np.array(embedding).astype("float32")
+    embedding = get_model().encode(
+        [question],
+        batch_size=1,
+        show_progress_bar=False,
+        convert_to_numpy=True
+    )
+
+    return embedding.astype("float32")

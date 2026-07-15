@@ -56,42 +56,58 @@ class QuestionRequest(BaseModel):
 
 @app.post("/upload")
 async def upload_pdf(file: UploadFile = File(...)):
+    try:
 
-    if file.content_type !="application/pdf":
-     raise HTTPException(
-        status_code=400,
-        detail="Only PDF files are allowed."
-      )
-    
-    file_path = os.path.join(UPLOAD_FOLDER, file.filename)
+        print("1")
 
-    with open(file_path, "wb") as buffer:
-       buffer.write(await file.read())
-       
-    pdf_text = extract_text_from_pdf(file_path)
+        if file.content_type != "application/pdf":
+            raise HTTPException(
+                status_code=400,
+                detail="Only PDF files are allowed."
+            )
 
-    if not pdf_text.strip():
-       raise HTTPException(
-         status_code=400,
-         detail="PDF contains no readable text"
-    )
+        print("2")
 
-    chunks = split_text_into_chunks(pdf_text)
-    
-    embeddings = create_embeddings(chunks)
+        file_path = os.path.join(UPLOAD_FOLDER, file.filename)
 
-    index = create_faiss_index(embeddings)
+        with open(file_path, "wb") as buffer:
+            buffer.write(await file.read())
 
-    save_faiss(index, chunks)
+        print("3")
 
-    
-    print("FAISS index created")
+        pdf_text = extract_text_from_pdf(file_path)
 
+        print("4")
 
-    return{
-       "message": "PDF uploaded successfully",
-       "filename": file.filename
-    }
+        chunks = split_text_into_chunks(pdf_text)
+
+        print("Chunks =", len(chunks))
+
+        embeddings = create_embeddings(chunks)
+
+        print("5")
+
+        index = create_faiss_index(embeddings)
+
+        print("6")
+
+        save_faiss(index, chunks)
+
+        print("7")
+
+        return {
+            "message": "Success"
+        }
+
+    except Exception as e:
+        import traceback
+
+        traceback.print_exc()
+
+        raise HTTPException(
+            status_code=500,
+            detail=str(e)
+        )
 
 
 
