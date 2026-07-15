@@ -15,7 +15,7 @@ def extract_text_from_pdf(pdf_path):
    return text
 
 
-def split_text_into_chunks(text, chunk_size=700, overlap=150):
+def split_text_into_chunks(text, chunk_size=500, overlap=100):
 
    chunks = []
    start = 0

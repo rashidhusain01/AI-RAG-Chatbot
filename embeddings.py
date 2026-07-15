@@ -14,9 +14,14 @@ def get_model():
 
 
 def create_embeddings(chunks):
-    embeddings = get_model().encode(chunks)
-    return np.array(embeddings).astype("float32")
+    embeddings = get_model().encode(
+        chunks,
+        batch_size=4,
+        show_progress_bar=False,
+        convert_to_numpy=True
+    )
 
+    return embeddings.astype("float32")
 
 def create_query_embedding(question):
     embedding = get_model().encode([question])
